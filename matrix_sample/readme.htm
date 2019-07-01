@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html
+  PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xml:lang="en-us" lang="en-us">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta name="DC.Type" content="topic"/>
+<meta name="DC.Title" content="Intel® VTune™ Amplifier Matrix Sample"/>
+<meta name="prodname" content="VTune™ Amplifier"/>
+<meta name="version" content="2018"/>
+<meta name="series" content=""/>
+<meta name="DC.Format" content="XHTML"/>
+<meta name="DC.Identifier" content="readme"/>
+<meta name="DC.Language" content="en-US"/>
+<link rel="stylesheet" type="text/css" href="resources/intel_gsp_styles.css"/>
+<title>Intel® VTune™ Amplifier Matrix Sample</title>
+<meta http-equiv="X-UA-Compatible" content="IE=Edge;chrome=1"/>
+<!-- BEGIN SCRIPTS FOR EXPAND/COLLAPSE FUNCTIONALITY -->
+<script src="resources/jquery-1.11.1.min.js"><!----></script>
+<script src="resources/hide-show.js"><!----></script>
+<!-- END SCRIPTS FOR EXPAND/COLLAPSE FUNCTIONALITY -->
+<!-- Prism script to support syntax highlighting-->
+<script src="resources/prism/prism.js"><!----></script>
+
+<!-- prism.css stylesheet to support syntax highlighting-->
+<link href="resources/prism/prism.css" rel="stylesheet"/>
+</head>
+<body class="titlepage" id="readme"><a name="readme"><!-- --></a>
+
+
+<div id="banner">
+<div id="bannerblock">
+<img src="resources/intel_logo.png" class="intellogo" alt="Intel logo"/>
+<!--No product image to be included-->
+<h1 class="title">Intel® VTune™ Amplifier Matrix Sample</h1>
+</div>
+</div>
+<div id="contentblock">
+<div id="mainmenu"><h3>Contents</h3><p><a class="mainmenulinks" href="#GUID-4E1826D8-7999-4E43-ACAC-3A074D6C8001"/></p>
+<p><a class="mainmenulinks" href="#GUID-C9E00BA2-CC4D-45A5-938B-517A6822074E">System Requirements</a></p>
+<p><a class="mainmenulinks" href="#GUID-105FAF0C-5E28-4451-98D9-2E241B90C27E">Build Instructions</a></p>
+<p><a class="mainmenulinks" href="#GUID-A15FE295-5651-49F6-AF52-71979C68D2B1">Related Tutorials</a></p>
+<p><a class="mainmenulinks" href="#GUID-46784D69-63A5-45AF-AA6F-ACF0FF9D2919"> Legal Information</a></p>
+</div>
+<div id="GUID-4E1826D8-7999-4E43-ACAC-3A074D6C8001"><p> The 
+		  <strong>matrix</strong> sample allows you to explore the various capabilities of the Intel® VTune™ Amplifier for analyzing threaded applications. 
+		</p>
+<p>By default, the sample uses a square matrix with the size of 2048. You may want to increase the matrix size by redefining the macro 
+		  <samp class="codeph">MAXTHREADS</samp> in the 
+		  <samp class="codeph">multiply.h</samp>. However, make sure the size is multiple of # of threads, which is made for simplicity. By default, the number of threads executed is equal to the number of CPU cores available in the system (defined in run-time). You may want to limit the maximum number of created threads by modifying the 
+		  <samp class="codeph">MAXTHREADS</samp>. 
+		</p>
+<p>By default, the sample uses a native 
+		  <span>pthreads</span> threading model. OpenMP* threading model is available. For the Intel® Math Kernel Library (Intel® MKL)-based kernel, consider either Intel MKL's multithreaded or single-threaded implementation. Make the kernel multithreaded by yourself in the latter case. To change the threading model, select 
+		  <span><samp class="codeph">PARAMODEL</samp> either of 
+			 <samp class="codeph">USE_THR</samp>, 
+			 <samp class="codeph">USE_OMP</samp>, or 
+			 <samp class="codeph">USE_MKL</samp></span>. 
+		</p>
+<p>You can select one among several kernels available in the sample. Specify one of them as a macro definition of 
+		  <samp class="codeph">MULTIPLY</samp> in the 
+		  <samp class="codeph">multiply.h</samp> header file and rebuild the project. 
+		</p>
+<p><a name="GUID-AC2C27E7-6204-4E59-85B5-48147EBE1903"><!-- --></a>
+<ul id="GUID-AC2C27E7-6204-4E59-85B5-48147EBE1903"><li id="LI_C72361B79D444406B339F15200DA3616"><a name="LI_C72361B79D444406B339F15200DA3616"><!-- --></a>
+<p><samp class="codeph">multiply0</samp> - Basic serial implementation 
+			 </p>
+</li>
+<li id="LI_436D8C576B26486D94F37CD68F964022"><a name="LI_436D8C576B26486D94F37CD68F964022"><!-- --></a>
+<p><samp class="codeph">multiply1</samp> - Basic multithreaded implementation 
+			 </p>
+</li>
+<li id="LI_D28AE54C07694082BF3A19D04DF6B995"><a name="LI_D28AE54C07694082BF3A19D04DF6B995"><!-- --></a>
+<p><samp class="codeph">multiply2</samp> - Optimized implementation with Loop interchange and vectorization (use Compiler vectorization options) 
+			 </p>
+</li>
+<li id="LI_5D07882CEA3446E7B91118AB4C770119"><a name="LI_5D07882CEA3446E7B91118AB4C770119"><!-- --></a>
+<p><samp class="codeph">multiply3</samp> - Optimized implementation with adding Cache blocking and data alignment (add 
+				<samp class="codeph">ALIGNED</samp> macro to Compiler preprocessor) 
+			 </p>
+</li>
+<li id="LI_679FA968FAD4413299BA74A2922B79DC"><a name="LI_679FA968FAD4413299BA74A2922B79DC"><!-- --></a>
+<p><samp class="codeph">multiply4</samp> - Optimized implementation with matrix transposition and loop unrolling 
+			 </p>
+</li>
+<li id="LI_71652B73C07B45829F550246DCA49B36"><a name="LI_71652B73C07B45829F550246DCA49B36"><!-- --></a>
+<p><samp class="codeph"> multiply5</samp> - Most optimal version with using Intel MKL. Link the Intel MKL library to the project and add the 
+				<samp class="codeph">USE_MKL</samp> macro to Compiler preprocessor. 
+			 </p>
+</li>
+</ul>
+</p>
+<div class="Note"><span class="notetitle">Note:</span> <p> Multiply kernels availability depends on the threading model you choose. 
+		  </p>
+</div>
+</div>
+<div id="GUID-C9E00BA2-CC4D-45A5-938B-517A6822074E">
+<h2><a name="GUID-C9E00BA2-CC4D-45A5-938B-517A6822074E"><!-- --></a>System Requirements</h2>
+<p><a name="GUID-52389598-4FFB-4CF1-88CF-80CA6EE952A9"><!-- --></a>
+<ul id="GUID-52389598-4FFB-4CF1-88CF-80CA6EE952A9"><li id="LI_D58B7E83E2FB41818BEE16A30C5B2E67"><a name="LI_D58B7E83E2FB41818BEE16A30C5B2E67"><!-- --></a>
+<p>Hardware: 
+			 </p>
+<a name="GUID-6ABB4425-A166-43E5-82FF-6B0E02EAF4A9"><!-- --></a>
+<ul id="GUID-6ABB4425-A166-43E5-82FF-6B0E02EAF4A9"><li id="LI_D4DF2B98963A415E9D81239A017FA355"><a name="LI_D4DF2B98963A415E9D81239A017FA355"><!-- --></a>
+<p> For the most up to date hardware requirements, see the Intel® VTune™ Amplifier 
+					 <a href="https://software.intel.com/en-us/articles/intel-vtune-amplifier-xe-release-notes" target="_blank">release notes</a></p>
+</li>
+</ul>
+</li>
+<li id="LI_B4A9870C02C04A8D9F9A1C0142CB0789"><a name="LI_B4A9870C02C04A8D9F9A1C0142CB0789"><!-- --></a>
+<p>Software: 
+			 </p>
+<a name="GUID-E1C1B670-01F3-4F3D-ADC6-1DEFCC5D1624"><!-- --></a>
+<ul id="GUID-E1C1B670-01F3-4F3D-ADC6-1DEFCC5D1624"><li id="LI_8E972B1B9D1D47858F827FB8B4B42BF5"><a name="LI_8E972B1B9D1D47858F827FB8B4B42BF5"><!-- --></a>
+<p>GNU* GCC 4.5 or newer 
+				  </p>
+</li>
+<li id="LI_212FEC9785F14B04A82968D94B1403B9"><a name="LI_212FEC9785F14B04A82968D94B1403B9"><!-- --></a>
+<p> Intel® C++ Compiler for Linux 18.0 or newer. More information can be obtained 
+					 <a href="https://software.intel.com/en-us/c-compilers" target="_blank">here</a></p>
+</li>
+</ul>
+</li>
+</ul>
+</p>
+</div>
+<div id="GUID-105FAF0C-5E28-4451-98D9-2E241B90C27E">
+<h2><a name="GUID-105FAF0C-5E28-4451-98D9-2E241B90C27E"><!-- --></a>Build Instructions</h2>
+<p>Use the 
+		  <samp class="codeph">Makefile</samp> in the 
+		  <samp class="codeph">linux</samp> subdirectory and specify the compiler you want to use: 
+		  <samp class="codeph">icc 
+		  </samp>or 
+		  <samp class="codeph">gcc</samp>. 
+		</p>
+<p>To compile with the Intel® C++ Compiler for Linux* with the Intel® Math Kernel Library, creating the 
+		  <samp class="codeph">matrix.mkl</samp> executable, modify the 
+		  <samp class="codeph">MULTIPLY</samp> macro to 
+		  <samp class="codeph">multiply5</samp> in 
+		  <samp class="codeph">multiply.h</samp> and then execute 
+		  <samp class="codeph">make mkl</samp></p>
+<p>More information can be found inside the 
+		  <samp class="codeph">Makefile</samp></p>
+<div class="Note"><span class="notetitle">Note:</span> <p>Detailed build instructions are available in the tutorials listed below. 
+		  </p>
+</div>
+</div>
+<div id="GUID-A15FE295-5651-49F6-AF52-71979C68D2B1">
+<h2><a name="GUID-A15FE295-5651-49F6-AF52-71979C68D2B1"><!-- --></a>Related Tutorials</h2>
+<p>The 
+		  <strong>matrix</strong> sample for the Intel® VTune™ Amplifier is accompanied by the following tutorial: 
+		</p>
+<p><a name="GUID-C6AC400B-1C5D-41AC-9AB6-C7858CB8CA53"><!-- --></a>
+<ul id="GUID-C6AC400B-1C5D-41AC-9AB6-C7858CB8CA53"><li id="LI_5D136F0F74E24295AF4B4189F73A380D"><a name="LI_5D136F0F74E24295AF4B4189F73A380D"><!-- --></a>
+<p><a href="https://software.intel.com/en-us/vtuneampxe_hwissues_lin_c" target="_blank">Identifying Hardware Issues</a>: Identify the hardware-related issues in your application such as data sharing, cache misses, branch misprediction, and others. 
+			 </p>
+</li>
+</ul>
+</p>
+</div>
+<div id="GUID-46784D69-63A5-45AF-AA6F-ACF0FF9D2919">
+<h2><a name="GUID-46784D69-63A5-45AF-AA6F-ACF0FF9D2919"><!-- --></a> Legal Information</h2>
+<p>Intel, the Intel logo, Intel Atom, Intel Core, Intel Xeon Phi, VTune and Xeon are trademarks of Intel Corporation in the U.S. and/or other countries. 
+    </p>
+<p>*Other names and brands may be claimed as the property of others. 
+    </p>
+<p>© 2017 - 
+		  2018, Intel Corporation 
+		</p>
+</div>
+</div>
+
+</body>
+</html>

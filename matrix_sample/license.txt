@@ -1,0 +1,12 @@
+Matrix Sample
+
+License Information Follows
+---------------------------
+* src/matrix.c src/multiply.c src/multiply.h src/thrmodel.c src/util.c Makefile 
+* resources/* tutorials/*
+
+Copyright 2018 Intel Corporation
+
+* license: http://software.intel.com/en-us/articles/intel-sample-source-code-license-agreement/  
+
+

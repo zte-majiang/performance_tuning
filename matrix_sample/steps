@@ -1,0 +1,3 @@
+perf 
+You see the allocation for the buf2 variable that is assigned to addr2, which is in its turn 
+assigned to array b. So, you may conclude that the problematic array is b. 

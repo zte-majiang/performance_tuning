@@ -1,0 +1,5 @@
+*.o
+perf.data
+perf.data.old
+.vscode*
+matrix_sample/matrix.gcc
