@@ -41,7 +41,7 @@ PARAMODEL = -DUSE_THR	# Default parallelism using pthreads/Win threads
 
 GCC     = gcc
 ICC     = icc
-CFLAGS  = -g3 -O2 -march=native
+CFLAGS  = -g3 -Ofast -march=native
 #PTFLAGS = -xSSE3 
 OPTFLAGS = -xCORE-AVX2 -xHost -fno-alias  -DALIGNED
 # OPTFLAGS = -xHost -fno-alias

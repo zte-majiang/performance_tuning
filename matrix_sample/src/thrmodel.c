@@ -138,7 +138,7 @@ void GetModelParams(int* p_nthreads, int* p_msize, int print)
 	while ((msize % nthr) != 0 )
 		nthr--;
 	// If kernel multiply0, set single threaded execution
-	if (MULTIPLY == multiply0)
+	if (MULTIPLY == multiply0 || MULTIPLY == multiply0_improve)
 		nthr = 1;
 
 	if(p_nthreads != 0)
