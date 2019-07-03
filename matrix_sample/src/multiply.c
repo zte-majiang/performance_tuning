@@ -38,7 +38,7 @@ void multiply0_improve(int msize, int tidx, int numt, TYPE a[][NUM], TYPE b[][NU
 {
 	int i,j,k;
 
-// Basic serial implementation
+// Basic serial implementation with Loop interchange
     for(i=0; i<msize; i++) {
         for(k=0; k<msize; k++) {
     	    for(j=0; j<msize; j++) {
@@ -52,10 +52,10 @@ void multiply1(int msize, int tidx, int numt, TYPE a[][NUM], TYPE b[][NUM], TYPE
 {
 	int i,j,k;
 
-// Naive implementation 
+// Naive implementation  multi thread
     for(i=tidx; i<msize; i=i+numt) {
-        for(k=0; k<msize; k++) {
-    	    for(j=0; j<msize; j++) {
+        for(j=0; j<msize; j++) {
+    	    for(k=0; k<msize; k++) {
 					c[i][j] = c[i][j] + a[i][k] * b[k][j];
 			}
 		}

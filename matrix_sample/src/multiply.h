@@ -18,7 +18,7 @@
 #else
 #define MAXTHREADS 16
 #define NUM 2048
-#define MATRIX_BLOCK_SIZE 128
+#define MATRIX_BLOCK_SIZE 32
 #endif
 
 typedef double TYPE;
@@ -26,8 +26,7 @@ typedef TYPE array[NUM];
 
 // Select which multiply kernel to use via the following macro so that the
 // kernel being used can be reported when the test is run.
-#define MULTIPLY multiply0_improve
-
+#define MULTIPLY multiply4
 extern void multiply0(int msize, int tidx, int numt, TYPE a[][NUM], TYPE b[][NUM], TYPE c[][NUM], TYPE t[][NUM]);
 extern void multiply0_improve(int msize, int tidx, int numt, TYPE a[][NUM], TYPE b[][NUM], TYPE c[][NUM], TYPE t[][NUM]);
 extern void multiply1(int msize, int tidx, int numt, TYPE a[][NUM], TYPE b[][NUM], TYPE c[][NUM], TYPE t[][NUM]);

@@ -4,13 +4,26 @@ perf mem record　可以看到内存延迟非常高
 You see the allocation for the buf2 variable that is assigned to addr2, which is in its turn 
 assigned to array b. So, you may conclude that the problematic array is b. 
 
+
+修改multiply.h中的#define MULTIPLY multiply1
+基础多线程版本
+
+
 修改multiply.h中的#define MULTIPLY multiply0_improve
-可以看到简单的变换一下访问内存的方式，就能提速１０倍以上。perf stat 可以看到ipc大幅度提升。
+可以看到简单的变换一下访问内存的方式，就能提速１０倍以上(实际上就不是每次先算出单个ｃ矩阵的值了)。perf stat 可以看到ipc大幅度提升。
 将-O2 改为-O2 -march=nativｅ可以看到，改用avx指令并没有大幅度提升性能。
 但是改为-Ofast 和 -Ofast -march=native后，可以看到循环展开加向量化还是明显提升了性能。
 
-修改multiply.h中的#define MULTIPLY multiply1
-多线程
+
+修改multiply.h中的#define MULTIPLY multiply2
+可以看到明显的性能提升
+
+
+
+
+
+
+
 
 
 
