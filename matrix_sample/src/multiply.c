@@ -95,10 +95,11 @@ void multiply3(int msize, int tidx, int numt, TYPE a[][NUM], TYPE b[][NUM], TYPE
             for (j0 =0; j0 < msize; j0 += mblock) {
                 for (i = i0; i < i0 + mblock; i++) {
                     for (k = k0; k < k0 + mblock; k++) {
-#pragma ivdep
+#pragma GCC ivdep
 #ifdef ALIGNED 
 	#pragma vector aligned
 #endif //ALIGNED
+//#pragma GCC unroll ４
                         for (j = j0; j < j0 + mblock; j++) {
                             c[i][j]  = c[i][j] + a[i][k] * b[k][j];
 						}
@@ -112,21 +113,25 @@ void multiply3(int msize, int tidx, int numt, TYPE a[][NUM], TYPE b[][NUM], TYPE
 void multiply4(int msize, int tidx, int numt, TYPE a[][NUM], TYPE b[][NUM], TYPE c[][NUM], TYPE t[][NUM])
 {
 	int i,j,k,istep,ibeg,ibound;
+#if 1
 //transpose b
 	for(i=0;i<msize;i++) {
 	    for(k=0;k<msize;k++) {
 		t[i][k] = b[k][i];
 		}
 	}
+#endif
 
     istep = msize / numt;
     ibeg = tidx * istep;
     ibound = ibeg + istep;
+#if 0
 /*  for(i=0;i<msize;i+=4) { // use instead for single threaded impl.*/
 	for(i=ibeg;i<ibound;i+=4) {
 	    for(j=0;j<msize;j+=4) {
 #pragma loop count (NUM)
-#pragma ivdep
+//#pragma GCC unroll 2048
+#pragma GCC ivdep
 			for(k=0;k<msize;k++) {
 				c[i][j] = c[i][j] + a[i][k] * t[j][k];
 				c[i+1][j] = c[i+1][j] + a[i+1][k] * t[j][k];
@@ -151,17 +156,21 @@ void multiply4(int msize, int tidx, int numt, TYPE a[][NUM], TYPE b[][NUM], TYPE
 		}
 	}
 
- /*
+#else
 	// it's the same to the loop above?
 	for(i=ibeg;i<ibound;i++) {
 	    for(j=0;j<msize;j++) {
 
 #pragma ivdep
 #pragma vector aligned
-
+#pragma GCC ivdep
+#pragma GCC unroll 8
 			for(k=0;k<msize;k++) {
-				c[i][j] = c[i][j] + a[i][k] * t[j][k];}}}
-*/
+				c[i][j] = c[i][j] + a[i][k] * t[j][k];
+				}
+			}
+		}
+#endif
 }
 #endif // USE_THR
 

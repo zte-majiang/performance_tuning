@@ -18,7 +18,7 @@
 #else
 #define MAXTHREADS 16
 #define NUM 2048
-#define MATRIX_BLOCK_SIZE 32
+#define MATRIX_BLOCK_SIZE 128
 #endif
 
 typedef double TYPE;

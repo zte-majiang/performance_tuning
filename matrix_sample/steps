@@ -19,6 +19,143 @@ assigned to array b. So, you may conclude that the problematic array is b.
 可以看到明显的性能提升
 
 
+icc 版本multiply3
+循环展开
+0x403766	104	vbroadcastsdq  (%r11,%r13,8), %ymm0	19800000	13200000       (%r11,%r13,8) -> %ymm0   ; 64 bits source  -> broadcast to 4 * 64 bits ymm0
+0x40376c	103	mov %rbx, %r15	297000000	89100000
+0x40376f	104	mov %rcx, %r14	36300000	26400000
+0x403772	0	Block 9:		                                     ymm0 is a[i][k], ymm1~8 is b[k][j]
+0x403772	104	vmovupdy  (%r14), %ymm1	29700000	13200000        %(r14) -> ymm1  load b[k][j]
+0x403777	104	vmovupdy  0x20(%r14), %ymm2	1247400000	1098900000
+0x40377d	104	vmovupdy  0x40(%r14), %ymm3	300300000	333300000
+0x403783	104	vmovupdy  0x60(%r14), %ymm4	963600000	808500000
+0x403789	104	vmovupdy  0x80(%r14), %ymm5	300300000	264000000
+0x403792	104	vmovupdy  0xa0(%r14), %ymm6	881100000	858000000
+0x40379b	104	vmovupdy  0xc0(%r14), %ymm7	316800000	270600000
+0x4037a4	104	vmovupdy  0xe0(%r14), %ymm8	993300000	841500000
+0x4037ad	104	vfmadd213pdy  (%rsi,%r15,8), %ymm0, %ymm1	290400000	273900000                   (%rsi,%r15,8) + %ymm0 * %ymm1 ->  %ymm1
+0x4037b3	104	vfmadd213pdy  0x20(%rsi,%r15,8), %ymm0, %ymm2	287100000	250800000　　
+0x4037ba	104	vfmadd213pdy  0x40(%rsi,%r15,8), %ymm0, %ymm3	297000000	250800000
+0x4037c1	104	vfmadd213pdy  0x60(%rsi,%r15,8), %ymm0, %ymm4	283800000	214500000
+0x4037c8	104	vfmadd213pdy  0x80(%rsi,%r15,8), %ymm0, %ymm5	234300000	250800000
+0x4037d2	104	vfmadd213pdy  0xa0(%rsi,%r15,8), %ymm0, %ymm6	280500000	224400000
+0x4037dc	104	vfmadd213pdy  0xc0(%rsi,%r15,8), %ymm0, %ymm7	290400000	250800000
+0x4037e6	104	vfmadd213pdy  0xe0(%rsi,%r15,8), %ymm0, %ymm8	270600000	290400000
+0x4037f0	104	vmovupdy  %ymm1, (%rsi,%r15,8)	227700000	277200000           (%rsi,%r15,8)　-> %ymm1   save to c[i][j]
+0x4037f6	104	vmovupdy  %ymm2, 0x20(%rsi,%r15,8)	33000000	46200000
+0x4037fd	104	vmovupdy  %ymm3, 0x40(%rsi,%r15,8)	128700000	112200000
+0x403804	104	vmovupdy  %ymm4, 0x60(%rsi,%r15,8)	6600000	49500000
+0x40380b	104	vmovupdy  %ymm5, 0x80(%rsi,%r15,8)	112200000	174900000
+0x403815	104	vmovupdy  %ymm6, 0xa0(%rsi,%r15,8)	19800000	36300000
+0x40381f	104	vmovupdy  %ymm7, 0xc0(%rsi,%r15,8)	115500000	158400000
+0x403829	104	vmovupdy  %ymm8, 0xe0(%rsi,%r15,8)	33000000	82500000
+0x403833	103	add $0x20, %r15	118800000	165000000
+0x403837	103	add $0x100, %r14	26400000	52800000
+0x40383e	103	cmp %r9, %r15	125400000	151800000
+0x403841	103	jb 0x403772 <Block 9>	0	0
+0x403847	0	Block 10:		
+0x403847	97	inc %r13	13200000	9900000
+0x40384a	97	add $0x4000, %rcx	26400000	46200000
+0x403851	97	cmp $0x80, %r13	6600000	6600000
+0x403858	97	jb 0x403766 <Block 8>	0	0
+0x40385e	0	Block 11:		
+0x40385e	96	inc %r8d		
+0x403861	96	add $0x4000, %rdi	0	0
+0x403868	96	cmp $0x80, %r8d		
+0x40386f	96	jb 0x403758 <Block 7>		
+
+gcc 版本
+
+非循环展开
+
+movq  -0x38(%rsp), %rsi	3300000
+mov %r8, %rcx                                                   	 a[] -> rcx 
+leaq  0x400(%r8), %rdi	
+leaq  (%r9,%r8,1), %rdx	
+nopl  %eax, (%rax)	
+Block 8:	
+xor %eax, %eax	6600000
+nopw  %ax, (%rax,%rax,1)	6600000
+Block 9:	                                            ymm0 is result ;(%rdx,%rax,1) is c[i][j]
+vmovupdy  (%rdx,%rax,1), %ymm1	386100000               b[k][j] -> ymm1
+vbroadcastsdq  (%rcx), %ymm0	491700000               a[i][k] -> ymm0
+vfmadd132pdy  (%rsi,%rax,1), %ymm1, %ymm0	1003200000   (%rsi,%rax,1) +  %ymm1 * %ymm0  -> %ymm0
+vmovupdy  %ymm0, (%rdx,%rax,1)	5068800000
+add $0x20, %rax	914100000
+cmp $0x400, %rax	518100000
+jnz 0x4019a0 <Block 9>	3300000
+Block 10:	
+add $0x8, %rcx	13200000
+add $0x4000, %rsi	9900000
+cmp %rcx, %rdi	26400000
+jnz 0x401998 <Block 8>	0
+
+
+
+循环展开
+Block 8:		
+xor %eax, %eax	16500000	29700000
+nopw  %ax, (%rax,%rax,1)	3300000	6600000
+Block 9:		
+vbroadcastsdq  (%rsi), %ymm0	49500000	118800000
+vmovupdy  (%rdx,%rax,1), %ymm1	504900000	386100000
+leaq  0x20(%rax), %rcx	201300000	145200000
+vfmadd132pdy  (%rdi,%rax,1), %ymm1, %ymm0	92400000	217800000
+vmovupdy  0x20(%rdx,%rax,1), %ymm2	1897500000	2897400000
+vmovupdy  0x40(%rdx,%rax,1), %ymm3	66000000	62700000
+vmovupdy  %ymm0, (%rdx,%rax,1)	89100000	165000000
+vbroadcastsdq  (%rsi), %ymm0	214500000	389400000
+vfmadd132pdy  0x20(%rax,%rdi,1), %ymm2, %ymm0	191400000	264000000
+vmovupdy  %ymm0, 0x20(%rdx,%rax,1)	1046100000	1257300000
+vbroadcastsdq  (%rsi), %ymm0	283800000	475200000
+vfmadd132pdy  0x40(%rax,%rdi,1), %ymm3, %ymm0	145200000	132000000
+vmovupdy  %ymm0, 0x40(%rdx,%rax,1)	1452000000	2253900000
+vbroadcastsdq  (%rsi), %ymm0	389400000	508200000
+vmovupdy  0x40(%rdx,%rcx,1), %ymm4	118800000	105600000
+leaq  0x60(%rcx), %rax	59400000	56100000
+vfmadd132pdy  0x40(%rdi,%rcx,1), %ymm4, %ymm0	66000000	99000000
+vmovupdy  %ymm0, 0x40(%rdx,%rcx,1)	844800000	1293600000
+cmp $0x3a0, %rcx	118800000	207900000
+jnz 0x4019a8 <Block 9>	0	0
+Block 10:		
+add $0x8, %rsi	9900000	9900000
+add $0x4000, %rdi	29700000	66000000
+cmp %rsi, %r8	13200000	13200000
+jnz 0x4019a0 <Block 8>	0	0
+Block 11:		
+
+
+
+multiply4
+icc 优化后的流程
+Block 26:	
+vmovupdy  (%r13,%r15,8), %ymm1	62700000
+vmovupdy  0x300(%rsp), %ymm15	52800000
+vfmadd231pdy  0x8000(%r14,%r15,8), %ymm1, %ymm0	75900000
+vfmadd231pdy  (%r14,%r15,8), %ymm1, %ymm15	310200000
+vfmadd231pdy  0xc000(%r14,%r15,8), %ymm1, %ymm8	247500000
+vmovupdy  %ymm15, 0x300(%rsp)	158400000
+vmovupdy  0x320(%rsp), %ymm15	59400000
+vfmadd231pdy  0x4000(%r14,%r15,8), %ymm1, %ymm15	52800000
+vmovupdy  0x4000(%r13,%r15,8), %ymm1	165000000
+vmovupdy  %ymm15, 0x320(%rsp)	56100000
+vfmadd231pdy  (%r14,%r15,8), %ymm1, %ymm4	56100000
+vfmadd231pdy  0x4000(%r14,%r15,8), %ymm1, %ymm14	112200000
+vfmadd231pdy  0x8000(%r14,%r15,8), %ymm1, %ymm11	132000000
+vfmadd231pdy  0xc000(%r14,%r15,8), %ymm1, %ymm7	69300000
+vmovupdy  0x8000(%r13,%r15,8), %ymm1	112200000
+vmovupdy  0xc000(%r13,%r15,8), %ymm15	49500000
+vfmadd231pdy  (%r14,%r15,8), %ymm1, %ymm3	135300000
+vfmadd231pdy  (%r14,%r15,8), %ymm15, %ymm2	125400000
+vfmadd231pdy  0x4000(%r14,%r15,8), %ymm1, %ymm13	158400000
+vfmadd231pdy  0x4000(%r14,%r15,8), %ymm15, %ymm12	85800000
+vfmadd231pdy  0x8000(%r14,%r15,8), %ymm1, %ymm10	102300000
+vfmadd231pdy  0x8000(%r14,%r15,8), %ymm15, %ymm9	85800000
+vfmadd231pdy  0xc000(%r14,%r15,8), %ymm1, %ymm6	75900000
+vfmadd231pdy  0xc000(%r14,%r15,8), %ymm15, %ymm5	95700000
+add $0x4, %r15	79200000
+cmp %r11, %r15	9900000
+jb 0x403dd0 <Block 26>	0
 
 
 
